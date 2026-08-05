@@ -59,6 +59,13 @@ instead of silently going offline.
 
 ## Entities
 
+> **Entity ids follow your Home Assistant language.** They are generated from the
+> translated entity name, so a Swedish instance gets
+> `sensor.storage_system_senaste_svar` where an English one gets
+> `sensor.storage_system_latest_answer`. The names below are the English ones — check
+> the device page for the ids on your instance. The bundled card does not care: it
+> resolves entities through the registry.
+
 One device per instance, with:
 
 - `binary_sensor.storage_system_api` — connectivity, attributes `base_url` and `service`
@@ -177,7 +184,7 @@ microphone_uses_ask: true
 | `microphone_uses_ask` | `true` | Microphone queries use `ask` (AI answer + TTS); typed queries always use `search`. |
 | `limit` | `5` | Match limit for `search`. |
 | `config_entry_id` | — | Only needed with more than one instance. |
-| `entity_prefix` | `sensor.storage_system` | Fallback source when a service response is unavailable. |
+| `entity_prefix` | `sensor.storage_system` | Last-resort id prefix, used only if the entity registry is unavailable. |
 
 Microphone input uses the browser's Web Speech API, which in practice means
 Chrome or Edge over HTTPS.
@@ -191,8 +198,9 @@ Chrome or Edge over HTTPS.
    dashboard resource entry.
 4. Replace `script.lagersystem_fraga` → `storagesystem.ask` and
    `script.lagersystem_sok` → `storagesystem.search` in your automations.
-5. Point dashboard cards at `sensor.storage_system_*` instead of the old
-   `input_text.lagersystem_*` and `sensor.lagersystem_latest_*` entities.
+5. Point dashboard cards at the new `sensor.storage_system_*` entities instead of the
+   old `input_text.lagersystem_*` ones. Check the device page for the exact ids — they
+   follow your Home Assistant language.
 6. Change the card type from `custom:lagersystem-search-card` to
    `custom:storagesystem-search-card`.
 

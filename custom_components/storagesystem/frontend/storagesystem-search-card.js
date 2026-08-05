@@ -1,4 +1,4 @@
-const CARD_VERSION = "1.0.1";
+const CARD_VERSION = "1.0.2";
 
 const STRINGS = {
   en: {
@@ -125,9 +125,37 @@ class StorageSystemSearchCard extends HTMLElement {
       .replace(/'/g, "&#39;");
   }
 
-  _entityValue(suffix) {
-    const entityId = `${this._config.entity_prefix}_${suffix}`;
-    const state = this._hass?.states?.[entityId];
+  /**
+   * Map translation_key -> entity_id for this integration.
+   *
+   * Entity ids are derived from the *translated* entity name, so they differ
+   * per Home Assistant language (sensor.storage_system_senaste_svar on a
+   * Swedish instance, ..._latest_answer on an English one). Resolving through
+   * the entity registry keeps the card working in any language.
+   */
+  _entityMap() {
+    const registry = this._hass?.entities;
+    if (!registry) {
+      return null;
+    }
+
+    const map = {};
+    for (const entry of Object.values(registry)) {
+      const platform = entry.platform ?? entry.pl;
+      const key = entry.translation_key ?? entry.tk;
+      const entityId = entry.entity_id ?? entry.ei;
+      if (platform === "storagesystem" && key && entityId) {
+        map[key] = entityId;
+      }
+    }
+    return Object.keys(map).length ? map : null;
+  }
+
+  _entityValue(key) {
+    const map = this._entityMap();
+    // Falls back to the English-named ids when the registry is unavailable.
+    const entityId = map ? map[key] : `${this._config.entity_prefix}_${key}`;
+    const state = entityId ? this._hass?.states?.[entityId] : undefined;
     if (!state || ["unknown", "unavailable", ""].includes(state.state)) {
       return "";
     }
