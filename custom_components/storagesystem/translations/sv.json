@@ -1,0 +1,111 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Lagersystem",
+        "description": "Ange den publika bas-URL:en till din Lagersystem-app och API-nyckeln från Inställningar -> Säkerhet.",
+        "data": {
+          "base_url": "Bas-URL",
+          "api_key": "API-nyckel"
+        },
+        "data_description": {
+          "base_url": "Den publika adressen till din app, utan sökvägen /api/public.",
+          "api_key": "Lämna tomt om appen körs utan publik API-nyckel."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Autentisera Lagersystem på nytt",
+        "description": "API-nyckeln för {base_url} avvisades. Ange den nuvarande nyckeln.",
+        "data": {
+          "api_key": "API-nyckel"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kunde inte nå appen på den adressen.",
+      "invalid_auth": "API-nyckeln avvisades.",
+      "invalid_url": "Bas-URL:en måste börja med http:// eller https://."
+    },
+    "abort": {
+      "already_configured": "Den här Lagersystem-instansen är redan konfigurerad.",
+      "reauth_successful": "Autentiseringen lyckades."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Alternativ för Lagersystem",
+        "data": {
+          "scan_interval": "Intervall för hälsokontroll (sekunder)",
+          "language": "Språk",
+          "speak": "Läs upp svar från ask-tjänsten",
+          "tts_entity": "Talsyntesentitet",
+          "media_player": "Mediaspelare"
+        },
+        "data_description": {
+          "language": "Används av det medföljande sökkortet.",
+          "speak": "När det är påslaget läser storagesystem.ask upp svaret."
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "api": { "name": "API" }
+    },
+    "sensor": {
+      "api_timestamp": { "name": "API-tidsstämpel" },
+      "latest_query": { "name": "Senaste fråga" },
+      "latest_answer": { "name": "Senaste svar" },
+      "latest_location": { "name": "Senaste plats" },
+      "latest_location_id": { "name": "Senaste plats-ID" },
+      "latest_box_id": { "name": "Senaste låd-ID" },
+      "latest_label": { "name": "Senaste etikett" },
+      "latest_session_id": { "name": "Senaste sessions-ID" },
+      "latest_source": { "name": "Senaste källa" },
+      "latest_summary": { "name": "Senaste sammanfattning" },
+      "latest_keywords": { "name": "Senaste nyckelord" },
+      "latest_thumbnail_url": { "name": "Senaste miniatyr-URL" },
+      "latest_original_url": { "name": "Senaste original-URL" },
+      "latest_match_count": { "name": "Senaste antal träffar" },
+      "latest_photo_count": { "name": "Senaste antal bilder" }
+    }
+  },
+  "services": {
+    "ask": {
+      "name": "Fråga",
+      "description": "Fråga lagersystemet var något finns och spara det AI-genererade svaret.",
+      "fields": {
+        "query": { "name": "Fråga", "description": "Vad letar du efter?" },
+        "speak": {
+          "name": "Läs upp",
+          "description": "Åsidosätter uppläsningsinställningen för det här anropet."
+        },
+        "tts_entity": {
+          "name": "Talsyntesentitet",
+          "description": "Åsidosätter den konfigurerade TTS-entiteten."
+        },
+        "media_player": {
+          "name": "Mediaspelare",
+          "description": "Åsidosätter den konfigurerade mediaspelaren."
+        },
+        "config_entry_id": {
+          "name": "Instans",
+          "description": "Behövs bara när flera instanser är konfigurerade."
+        }
+      }
+    },
+    "search": {
+      "name": "Sök",
+      "description": "Sök i lagersystemet och spara bästa träffen utan att generera ett svar.",
+      "fields": {
+        "query": { "name": "Sökord", "description": "Vad du vill söka efter." },
+        "limit": { "name": "Gräns", "description": "Högsta antal träffar att hämta." },
+        "config_entry_id": {
+          "name": "Instans",
+          "description": "Behövs bara när flera instanser är konfigurerade."
+        }
+      }
+    }
+  }
+}

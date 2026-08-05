@@ -1,0 +1,13 @@
+{
+  "domain": "storagesystem",
+  "name": "Storage System",
+  "codeowners": ["@Snille"],
+  "config_flow": true,
+  "dependencies": ["http", "frontend"],
+  "documentation": "https://github.com/Snille/storagesystem-ha",
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/Snille/storagesystem-ha/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

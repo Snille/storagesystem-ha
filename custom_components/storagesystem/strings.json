@@ -1,0 +1,111 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Storage System",
+        "description": "Enter the public base URL of your Storage System app and the API key from Settings -> Security.",
+        "data": {
+          "base_url": "Base URL",
+          "api_key": "API key"
+        },
+        "data_description": {
+          "base_url": "The public address of your app, without the /api/public path.",
+          "api_key": "Leave empty if the app runs without a public API key."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate Storage System",
+        "description": "The API key for {base_url} was rejected. Enter the current key.",
+        "data": {
+          "api_key": "API key"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the app at that address.",
+      "invalid_auth": "The API key was rejected.",
+      "invalid_url": "The base URL must start with http:// or https://."
+    },
+    "abort": {
+      "already_configured": "This Storage System instance is already configured.",
+      "reauth_successful": "Reauthentication was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Storage System options",
+        "data": {
+          "scan_interval": "Health check interval (seconds)",
+          "language": "Language",
+          "speak": "Speak answers from the ask service",
+          "tts_entity": "Text-to-speech entity",
+          "media_player": "Media player"
+        },
+        "data_description": {
+          "language": "Used by the bundled search card.",
+          "speak": "When enabled, storagesystem.ask reads the answer out loud."
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "api": { "name": "API" }
+    },
+    "sensor": {
+      "api_timestamp": { "name": "API timestamp" },
+      "latest_query": { "name": "Latest query" },
+      "latest_answer": { "name": "Latest answer" },
+      "latest_location": { "name": "Latest location" },
+      "latest_location_id": { "name": "Latest location ID" },
+      "latest_box_id": { "name": "Latest box ID" },
+      "latest_label": { "name": "Latest label" },
+      "latest_session_id": { "name": "Latest session ID" },
+      "latest_source": { "name": "Latest source" },
+      "latest_summary": { "name": "Latest summary" },
+      "latest_keywords": { "name": "Latest keywords" },
+      "latest_thumbnail_url": { "name": "Latest thumbnail URL" },
+      "latest_original_url": { "name": "Latest original URL" },
+      "latest_match_count": { "name": "Latest match count" },
+      "latest_photo_count": { "name": "Latest photo count" }
+    }
+  },
+  "services": {
+    "ask": {
+      "name": "Ask",
+      "description": "Ask the storage system where something is and store the AI-generated answer.",
+      "fields": {
+        "query": { "name": "Question", "description": "What are you looking for?" },
+        "speak": {
+          "name": "Speak",
+          "description": "Override the speak option for this call."
+        },
+        "tts_entity": {
+          "name": "Text-to-speech entity",
+          "description": "Overrides the configured TTS entity."
+        },
+        "media_player": {
+          "name": "Media player",
+          "description": "Overrides the configured media player."
+        },
+        "config_entry_id": {
+          "name": "Instance",
+          "description": "Only needed when several instances are configured."
+        }
+      }
+    },
+    "search": {
+      "name": "Search",
+      "description": "Search the storage system and store the top match without generating an answer.",
+      "fields": {
+        "query": { "name": "Query", "description": "What to search for." },
+        "limit": { "name": "Limit", "description": "Maximum number of matches to request." },
+        "config_entry_id": {
+          "name": "Instance",
+          "description": "Only needed when several instances are configured."
+        }
+      }
+    }
+  }
+}

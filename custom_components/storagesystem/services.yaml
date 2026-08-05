@@ -1,0 +1,41 @@
+ask:
+  fields:
+    query:
+      required: true
+      example: Where are the junction boxes?
+      selector:
+        text:
+    speak:
+      selector:
+        boolean:
+    tts_entity:
+      selector:
+        entity:
+          domain: tts
+    media_player:
+      selector:
+        entity:
+          domain: media_player
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: storagesystem
+
+search:
+  fields:
+    query:
+      required: true
+      example: junction boxes
+      selector:
+        text:
+    limit:
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 50
+          mode: box
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: storagesystem
