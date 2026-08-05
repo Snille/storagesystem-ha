@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
@@ -13,10 +12,10 @@ from homeassistant.core import (
     ServiceResponse,
     SupportsResponse,
 )
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 
-from .api import StorageSystemError
+from .actions import async_ask, async_search, async_speak
 from .const import (
     ATTR_CONFIG_ENTRY_ID,
     ATTR_LIMIT,
@@ -26,12 +25,9 @@ from .const import (
     CONF_TTS_ENTITY,
     DEFAULT_SEARCH_LIMIT,
     DOMAIN,
-    EVENT_RESULT,
-    EVENT_RESULT_LEGACY,
     SERVICE_ASK,
     SERVICE_SEARCH,
 )
-from .result import build_error_result, build_result
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -87,50 +83,6 @@ def _resolve_entry(hass: HomeAssistant, call: ServiceCall) -> ConfigEntry:
     return loaded[0]
 
 
-async def _async_speak(
-    hass: HomeAssistant, entry: ConfigEntry, call: ServiceCall, message: str
-) -> None:
-    """Read the answer out loud, if TTS is configured and not overridden off."""
-    if not message:
-        return
-
-    speak = call.data.get(CONF_SPEAK, entry.options.get(CONF_SPEAK, False))
-    if not speak:
-        return
-
-    tts_entity = call.data.get(CONF_TTS_ENTITY) or entry.options.get(CONF_TTS_ENTITY)
-    media_player = call.data.get(CONF_MEDIA_PLAYER) or entry.options.get(CONF_MEDIA_PLAYER)
-
-    if not tts_entity or not media_player:
-        _LOGGER.warning(
-            "Storage System was asked to speak but no TTS entity and media player are configured"
-        )
-        return
-
-    try:
-        await hass.services.async_call(
-            "tts",
-            "speak",
-            {
-                "entity_id": tts_entity,
-                "media_player_entity_id": media_player,
-                "message": message,
-            },
-            blocking=False,
-        )
-    except HomeAssistantError as err:
-        _LOGGER.warning("Storage System could not speak the answer: %s", err)
-
-
-def _publish(hass: HomeAssistant, entry: ConfigEntry, result: dict[str, Any]) -> None:
-    """Store the result on the coordinator and fire the result events."""
-    entry.runtime_data.async_set_result(result)
-
-    event_data = {**result, "entry_id": entry.entry_id}
-    hass.bus.async_fire(EVENT_RESULT, event_data)
-    hass.bus.async_fire(EVENT_RESULT_LEGACY, event_data)
-
-
 def async_setup_services(hass: HomeAssistant) -> None:
     """Register the integration-level services once."""
     if hass.services.has_service(DOMAIN, SERVICE_ASK):
@@ -139,36 +91,24 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def async_handle_ask(call: ServiceCall) -> ServiceResponse:
         """Ask the AI endpoint, store the answer, and optionally speak it."""
         entry = _resolve_entry(hass, call)
-        query = call.data[ATTR_QUERY]
+        result = await async_ask(hass, entry, call.data[ATTR_QUERY])
 
-        try:
-            payload = await entry.runtime_data.client.async_ask(query)
-        except StorageSystemError as err:
-            result = build_error_result(mode="ask", query=query, message=str(err))
-            _publish(hass, entry, result)
-            raise HomeAssistantError(f"Storage System ask failed: {err}") from err
-
-        result = build_result(payload, mode="ask", query=query)
-        _publish(hass, entry, result)
-        await _async_speak(hass, entry, call, result["answer"])
+        await async_speak(
+            hass,
+            entry,
+            result["answer"],
+            speak=call.data.get(CONF_SPEAK),
+            tts_entity=call.data.get(CONF_TTS_ENTITY),
+            media_player=call.data.get(CONF_MEDIA_PLAYER),
+        )
         return result
 
     async def async_handle_search(call: ServiceCall) -> ServiceResponse:
         """Run a plain search and store the top match."""
         entry = _resolve_entry(hass, call)
-        query = call.data[ATTR_QUERY]
-        limit = call.data.get(ATTR_LIMIT, DEFAULT_SEARCH_LIMIT)
-
-        try:
-            payload = await entry.runtime_data.client.async_search(query, limit)
-        except StorageSystemError as err:
-            result = build_error_result(mode="search", query=query, message=str(err))
-            _publish(hass, entry, result)
-            raise HomeAssistantError(f"Storage System search failed: {err}") from err
-
-        result = build_result(payload, mode="search", query=query)
-        _publish(hass, entry, result)
-        return result
+        return await async_search(
+            hass, entry, call.data[ATTR_QUERY], call.data.get(ATTR_LIMIT, DEFAULT_SEARCH_LIMIT)
+        )
 
     hass.services.async_register(
         DOMAIN,

@@ -40,35 +40,69 @@
           "language": "Language",
           "speak": "Speak answers from the ask service",
           "tts_entity": "Text-to-speech entity",
-          "media_player": "Media player"
+          "media_player": "Media player",
+          "enable_conversation": "Expose a conversation agent"
         },
         "data_description": {
           "language": "Used by the bundled search card.",
-          "speak": "When enabled, storagesystem.ask reads the answer out loud."
+          "speak": "When enabled, storagesystem.ask reads the answer out loud.",
+          "enable_conversation": "Adds a conversation agent that sends everything said to it straight to the storage system. Point an Assist pipeline at it to turn a voice satellite into a storage-search kiosk."
         }
       }
     }
   },
   "entity": {
     "binary_sensor": {
-      "api": { "name": "API" }
+      "api": {
+        "name": "API"
+      }
     },
     "sensor": {
-      "api_timestamp": { "name": "API timestamp" },
-      "latest_query": { "name": "Latest query" },
-      "latest_answer": { "name": "Latest answer" },
-      "latest_location": { "name": "Latest location" },
-      "latest_location_id": { "name": "Latest location ID" },
-      "latest_box_id": { "name": "Latest box ID" },
-      "latest_label": { "name": "Latest label" },
-      "latest_session_id": { "name": "Latest session ID" },
-      "latest_source": { "name": "Latest source" },
-      "latest_summary": { "name": "Latest summary" },
-      "latest_keywords": { "name": "Latest keywords" },
-      "latest_thumbnail_url": { "name": "Latest thumbnail URL" },
-      "latest_original_url": { "name": "Latest original URL" },
-      "latest_match_count": { "name": "Latest match count" },
-      "latest_photo_count": { "name": "Latest photo count" }
+      "api_timestamp": {
+        "name": "API timestamp"
+      },
+      "latest_query": {
+        "name": "Latest query"
+      },
+      "latest_answer": {
+        "name": "Latest answer"
+      },
+      "latest_location": {
+        "name": "Latest location"
+      },
+      "latest_location_id": {
+        "name": "Latest location ID"
+      },
+      "latest_box_id": {
+        "name": "Latest box ID"
+      },
+      "latest_label": {
+        "name": "Latest label"
+      },
+      "latest_session_id": {
+        "name": "Latest session ID"
+      },
+      "latest_source": {
+        "name": "Latest source"
+      },
+      "latest_summary": {
+        "name": "Latest summary"
+      },
+      "latest_keywords": {
+        "name": "Latest keywords"
+      },
+      "latest_thumbnail_url": {
+        "name": "Latest thumbnail URL"
+      },
+      "latest_original_url": {
+        "name": "Latest original URL"
+      },
+      "latest_match_count": {
+        "name": "Latest match count"
+      },
+      "latest_photo_count": {
+        "name": "Latest photo count"
+      }
     }
   },
   "services": {
@@ -76,7 +110,10 @@
       "name": "Ask",
       "description": "Ask the storage system where something is and store the AI-generated answer.",
       "fields": {
-        "query": { "name": "Question", "description": "What are you looking for?" },
+        "query": {
+          "name": "Question",
+          "description": "What are you looking for?"
+        },
         "speak": {
           "name": "Speak",
           "description": "Override the speak option for this call."
@@ -99,8 +136,14 @@
       "name": "Search",
       "description": "Search the storage system and store the top match without generating an answer.",
       "fields": {
-        "query": { "name": "Query", "description": "What to search for." },
-        "limit": { "name": "Limit", "description": "Maximum number of matches to request." },
+        "query": {
+          "name": "Query",
+          "description": "What to search for."
+        },
+        "limit": {
+          "name": "Limit",
+          "description": "Maximum number of matches to request."
+        },
         "config_entry_id": {
           "name": "Instance",
           "description": "Only needed when several instances are configured."

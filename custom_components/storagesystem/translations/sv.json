@@ -40,35 +40,69 @@
           "language": "Språk",
           "speak": "Läs upp svar från ask-tjänsten",
           "tts_entity": "Talsyntesentitet",
-          "media_player": "Mediaspelare"
+          "media_player": "Mediaspelare",
+          "enable_conversation": "Exponera en conversation-agent"
         },
         "data_description": {
           "language": "Används av det medföljande sökkortet.",
-          "speak": "När det är påslaget läser storagesystem.ask upp svaret."
+          "speak": "När det är påslaget läser storagesystem.ask upp svaret.",
+          "enable_conversation": "Lägger till en conversation-agent som skickar allt som sägs till den rakt in i lagersystemet. Peka en Assist-pipeline mot den för att göra en röstsatellit till en lagersöks-kiosk."
         }
       }
     }
   },
   "entity": {
     "binary_sensor": {
-      "api": { "name": "API" }
+      "api": {
+        "name": "API"
+      }
     },
     "sensor": {
-      "api_timestamp": { "name": "API-tidsstämpel" },
-      "latest_query": { "name": "Senaste fråga" },
-      "latest_answer": { "name": "Senaste svar" },
-      "latest_location": { "name": "Senaste plats" },
-      "latest_location_id": { "name": "Senaste plats-ID" },
-      "latest_box_id": { "name": "Senaste låd-ID" },
-      "latest_label": { "name": "Senaste etikett" },
-      "latest_session_id": { "name": "Senaste sessions-ID" },
-      "latest_source": { "name": "Senaste källa" },
-      "latest_summary": { "name": "Senaste sammanfattning" },
-      "latest_keywords": { "name": "Senaste nyckelord" },
-      "latest_thumbnail_url": { "name": "Senaste miniatyr-URL" },
-      "latest_original_url": { "name": "Senaste original-URL" },
-      "latest_match_count": { "name": "Senaste antal träffar" },
-      "latest_photo_count": { "name": "Senaste antal bilder" }
+      "api_timestamp": {
+        "name": "API-tidsstämpel"
+      },
+      "latest_query": {
+        "name": "Senaste fråga"
+      },
+      "latest_answer": {
+        "name": "Senaste svar"
+      },
+      "latest_location": {
+        "name": "Senaste plats"
+      },
+      "latest_location_id": {
+        "name": "Senaste plats-ID"
+      },
+      "latest_box_id": {
+        "name": "Senaste låd-ID"
+      },
+      "latest_label": {
+        "name": "Senaste etikett"
+      },
+      "latest_session_id": {
+        "name": "Senaste sessions-ID"
+      },
+      "latest_source": {
+        "name": "Senaste källa"
+      },
+      "latest_summary": {
+        "name": "Senaste sammanfattning"
+      },
+      "latest_keywords": {
+        "name": "Senaste nyckelord"
+      },
+      "latest_thumbnail_url": {
+        "name": "Senaste miniatyr-URL"
+      },
+      "latest_original_url": {
+        "name": "Senaste original-URL"
+      },
+      "latest_match_count": {
+        "name": "Senaste antal träffar"
+      },
+      "latest_photo_count": {
+        "name": "Senaste antal bilder"
+      }
     }
   },
   "services": {
@@ -76,7 +110,10 @@
       "name": "Fråga",
       "description": "Fråga lagersystemet var något finns och spara det AI-genererade svaret.",
       "fields": {
-        "query": { "name": "Fråga", "description": "Vad letar du efter?" },
+        "query": {
+          "name": "Fråga",
+          "description": "Vad letar du efter?"
+        },
         "speak": {
           "name": "Läs upp",
           "description": "Åsidosätter uppläsningsinställningen för det här anropet."
@@ -99,8 +136,14 @@
       "name": "Sök",
       "description": "Sök i lagersystemet och spara bästa träffen utan att generera ett svar.",
       "fields": {
-        "query": { "name": "Sökord", "description": "Vad du vill söka efter." },
-        "limit": { "name": "Gräns", "description": "Högsta antal träffar att hämta." },
+        "query": {
+          "name": "Sökord",
+          "description": "Vad du vill söka efter."
+        },
+        "limit": {
+          "name": "Gräns",
+          "description": "Högsta antal träffar att hämta."
+        },
         "config_entry_id": {
           "name": "Instans",
           "description": "Behövs bara när flera instanser är konfigurerade."

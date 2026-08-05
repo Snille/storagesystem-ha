@@ -3,7 +3,7 @@
   "name": "Storage System",
   "codeowners": ["@Snille"],
   "config_flow": true,
-  "dependencies": ["http", "frontend"],
+  "dependencies": ["conversation", "http", "frontend"],
   "documentation": "https://github.com/Snille/storagesystem-ha",
   "integration_type": "service",
   "iot_class": "local_polling",

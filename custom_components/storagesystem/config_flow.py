@@ -33,6 +33,7 @@ from .api import StorageSystemAuthError, StorageSystemClient, StorageSystemError
 from .const import (
     CONF_API_KEY,
     CONF_BASE_URL,
+    CONF_ENABLE_CONVERSATION,
     CONF_LANGUAGE,
     CONF_MEDIA_PLAYER,
     CONF_SCAN_INTERVAL,
@@ -187,6 +188,10 @@ class StorageSystemOptionsFlow(OptionsFlow):
                 ): SelectSelector(
                     SelectSelectorConfig(options=LANGUAGES, mode=SelectSelectorMode.DROPDOWN)
                 ),
+                vol.Optional(
+                    CONF_ENABLE_CONVERSATION,
+                    default=options.get(CONF_ENABLE_CONVERSATION, True),
+                ): BooleanSelector(),
                 vol.Optional(
                     CONF_SPEAK, default=options.get(CONF_SPEAK, False)
                 ): BooleanSelector(),

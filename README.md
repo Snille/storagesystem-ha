@@ -134,6 +134,31 @@ actions:
 mode: queued
 ```
 
+## Voice: the conversation agent
+
+The integration exposes `conversation.storage_system`, a stateless agent that forwards
+**everything** said to it straight to `/api/public/ask` and returns the answer as speech.
+Point an Assist pipeline at it and any satellite using that pipeline becomes a dedicated
+storage-search kiosk — you just ask *"Where are the junction boxes?"*, with no wake prefix
+and no sentence matching.
+
+1. **Settings → Voice assistants → Add assistant**, set **Conversation agent → Storage
+   System**, and pick your STT/TTS (e.g. Whisper and Piper).
+2. Point the satellite's Assist pipeline setting at that pipeline.
+
+Notes:
+
+- Because the satellite speaks the answer itself, this path never uses the *Speak answers*
+  option. Leave that **off** for voice satellites, or you get the answer twice.
+- A satellite on this pipeline can no longer do normal HA voice control (lights, timers) —
+  everything goes to storage. That's the point; use another device or pipeline for those.
+- Voice queries update the same sensors and fire the same events as the services, so a
+  dashboard stays in sync with what was asked by voice.
+- Semicolons in answers are turned into periods, because most TTS engines barely pause on
+  a semicolon and the answer comes out as one rushed run-on sentence.
+- Turn the agent off entirely with the *Expose a conversation agent* option. The entity
+  then goes `unavailable`; remove it from the entity registry if you want it gone.
+
 ## Search card
 
 The card is registered automatically — add it to a dashboard with:
@@ -172,6 +197,38 @@ Chrome or Edge over HTTPS.
    `custom:storagesystem-search-card`.
 
 Automations that only listen for `lagersystem_result` need no changes.
+
+### If you used the `verkstan_conversation` custom component
+
+That hand-copied agent called `rest_command.lagersystem_ask` from the YAML package. It is
+replaced by `conversation.storage_system`:
+
+1. Enable *Expose a conversation agent* (on by default).
+2. Repoint your Assist pipeline's conversation agent to **Storage System**. STT and TTS
+   (Whisper/Piper) stay exactly as they are, and the satellite firmware needs no change.
+3. Remove the integration entry, then delete `/config/custom_components/verkstan_conversation/`
+   and restart.
+
+If you used the prefix-word route instead (`custom_sentences/…/verkstan.yaml` plus an
+`intent_script`), replace the `rest_command.lagersystem_ask` call in the `intent_script`
+with `storagesystem.ask` and read the answer from the response instead of the helper:
+
+```yaml
+intent_script:
+  VerkstanFraga:
+    speech:
+      text: "{{ answer_text }}"
+    action:
+      - action: storagesystem.ask
+        data:
+          query: "{{ query }}"
+          speak: false
+        response_variable: resp
+      - variables:
+          answer_text: >-
+            {{ (resp.answer | default('') | regex_replace(';\s*', '. '))
+               or 'Jag hittade inget tydligt svar.' }}
+```
 
 ## Label printing
 

@@ -17,6 +17,7 @@ CONF_LANGUAGE: Final = "language"
 CONF_SPEAK: Final = "speak"
 CONF_TTS_ENTITY: Final = "tts_entity"
 CONF_MEDIA_PLAYER: Final = "media_player"
+CONF_ENABLE_CONVERSATION: Final = "enable_conversation"
 
 LANGUAGES: Final = ["en", "sv", "de"]
 DEFAULT_LANGUAGE: Final = "en"
