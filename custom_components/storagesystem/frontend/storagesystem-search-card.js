@@ -1,4 +1,4 @@
-const CARD_VERSION = "1.0.3";
+const CARD_VERSION = "1.0.4";
 
 const STRINGS = {
   en: {
@@ -296,6 +296,7 @@ class StorageSystemSearchCard extends HTMLElement {
     const originalUrl = result.original_url || thumbnailUrl;
     const source = result.source || "";
     const matchCount = result.match_count ?? "";
+    const hasResult = Boolean(answer || label || location || summary || thumbnailUrl);
     const disabledAttr = this._loading ? "disabled" : "";
 
     this.shadowRoot.innerHTML = `
@@ -409,7 +410,16 @@ class StorageSystemSearchCard extends HTMLElement {
                 : ""
             }
             <div>
-              <div class="answer">${this._escapeHtml(answer || strings.noAnswer)}</div>
+              ${
+                // `search` returns matches without an answer text, so an empty
+                // answer is normal there — only say "no answer yet" when there
+                // is genuinely nothing to show.
+                answer
+                  ? `<div class="answer">${this._escapeHtml(answer)}</div>`
+                  : hasResult
+                    ? ""
+                    : `<div class="answer">${strings.noAnswer}</div>`
+              }
               ${label ? `<div class="line"><span class="label">${this._escapeHtml(label)}</span></div>` : ""}
               ${location ? `<div class="line">${strings.location}: ${this._escapeHtml(location)}</div>` : ""}
               ${summary ? `<div class="line">${strings.summary}: ${this._escapeHtml(summary)}</div>` : ""}
