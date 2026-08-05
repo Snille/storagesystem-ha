@@ -18,7 +18,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from .coordinator import StorageSystemCoordinator
+from .coordinator import StorageSystemCoordinator, result_store
 from .frontend import async_register_frontend
 from .services import async_setup_services, async_unload_services
 
@@ -43,6 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: StorageSystemConfigEntry
 
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
     coordinator = StorageSystemCoordinator(hass, entry, client, scan_interval)
+    await coordinator.async_load_last_result()
 
     # Raises ConfigEntryNotReady / ConfigEntryAuthFailed on its own.
     await coordinator.async_config_entry_first_refresh()
@@ -66,6 +67,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: StorageSystemConfigEntr
         async_unload_services(hass)
 
     return unloaded
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: StorageSystemConfigEntry) -> None:
+    """Drop the stored last result when the entry is deleted."""
+    await result_store(hass, entry.entry_id).async_remove()
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: StorageSystemConfigEntry) -> None:

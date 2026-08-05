@@ -80,6 +80,9 @@ One device per instance, with:
 Every result sensor carries `query` and `mode` attributes, plus `full_value` when
 the text was too long to fit in the state.
 
+The latest result is persisted, so the sensors and the card still show the last answer
+after a Home Assistant restart rather than going blank.
+
 ## Services
 
 ### `storagesystem.ask`

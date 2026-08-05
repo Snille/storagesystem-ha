@@ -1,4 +1,4 @@
-const CARD_VERSION = "1.0.2";
+const CARD_VERSION = "1.0.3";
 
 const STRINGS = {
   en: {
