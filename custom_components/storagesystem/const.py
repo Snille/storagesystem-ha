@@ -38,5 +38,8 @@ EVENT_RESULT_LEGACY: Final = "lagersystem_result"
 FRONTEND_URL_BASE: Final = "/storagesystem_frontend"
 FRONTEND_CARD_FILENAME: Final = "storagesystem-search-card.js"
 
-# Home Assistant rejects state strings longer than this.
-MAX_STATE_LENGTH: Final = 255
+# Home Assistant rejects state strings longer than 255 characters, but long
+# states also wrap over several lines and squeeze the entity name in the device
+# page, so states are shortened well before that. The untruncated text stays
+# available as the full_value attribute.
+STATE_DISPLAY_LENGTH: Final = 100

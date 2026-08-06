@@ -6,18 +6,20 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
+from urllib.parse import urlsplit
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
 )
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt as dt_util
 
 from . import StorageSystemConfigEntry
-from .const import MAX_STATE_LENGTH
+from .const import STATE_DISPLAY_LENGTH
 from .coordinator import StorageSystemCoordinator
 from .entity import StorageSystemEntity
 
@@ -27,10 +29,24 @@ class StorageSystemSensorDescription(SensorEntityDescription):
     """Describes a sensor fed from the latest result."""
 
     value_fn: Callable[[dict[str, Any]], Any]
+    display_fn: Callable[[str], str] | None = None
 
 
 def _text(key: str) -> Callable[[dict[str, Any]], Any]:
     return lambda result: result.get(key) or None
+
+
+def _short_url(url: str) -> str:
+    """Render an asset URL as something readable, e.g. ``d716cc5f…/thumbnail``.
+
+    Signed asset URLs are ~120 characters of host, uuid and key, none of which
+    says anything at a glance. The full URL stays in the full_value attribute.
+    """
+    segments = [segment for segment in urlsplit(url).path.split("/") if segment]
+    if len(segments) < 2:
+        return url
+    asset_id, kind = segments[-2], segments[-1]
+    return f"{asset_id.split('-')[0]}…/{kind}"
 
 
 RESULT_SENSORS: tuple[StorageSystemSensorDescription, ...] = (
@@ -100,13 +116,19 @@ RESULT_SENSORS: tuple[StorageSystemSensorDescription, ...] = (
         key="latest_thumbnail_url",
         translation_key="latest_thumbnail_url",
         icon="mdi:image-outline",
+        # Raw asset URLs are plumbing for the card, not something to read in the
+        # main sensor list, so they live in the collapsed diagnostic section.
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=_text("thumbnail_url"),
+        display_fn=_short_url,
     ),
     StorageSystemSensorDescription(
         key="latest_original_url",
         translation_key="latest_original_url",
         icon="mdi:image",
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=_text("original_url"),
+        display_fn=_short_url,
     ),
     StorageSystemSensorDescription(
         key="latest_match_count",
@@ -153,13 +175,20 @@ class StorageSystemResultSensor(StorageSystemEntity, SensorEntity):
         super().__init__(coordinator, description.key)
         self.entity_description = description
 
+    def _display(self, value: Any) -> Any:
+        """Shorten a value so it stays on one or two lines in the UI."""
+        if not isinstance(value, str):
+            return value
+        if display_fn := self.entity_description.display_fn:
+            value = display_fn(value)
+        if len(value) > STATE_DISPLAY_LENGTH:
+            return f"{value[: STATE_DISPLAY_LENGTH - 1]}…"
+        return value
+
     @property
     def native_value(self) -> Any:
-        """Return the value, truncated to what Home Assistant accepts as a state."""
-        value = self.entity_description.value_fn(self.coordinator.last_result)
-        if isinstance(value, str) and len(value) > MAX_STATE_LENGTH:
-            return f"{value[: MAX_STATE_LENGTH - 1]}…"
-        return value
+        """Return the value, shortened to keep the UI layout intact."""
+        return self._display(self.entity_description.value_fn(self.coordinator.last_result))
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
@@ -174,7 +203,7 @@ class StorageSystemResultSensor(StorageSystemEntity, SensorEntity):
         }
 
         value = self.entity_description.value_fn(result)
-        if isinstance(value, str) and len(value) > MAX_STATE_LENGTH:
+        if isinstance(value, str) and self._display(value) != value:
             attributes["full_value"] = value
 
         if self.entity_description.key == "latest_keywords":

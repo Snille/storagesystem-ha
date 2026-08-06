@@ -76,9 +76,14 @@ One device per instance, with:
   `_latest_thumbnail_url`, `_latest_original_url`
 - disabled by default (enable them if you need them): `_latest_location_id`,
   `_latest_session_id`
+- filed under Diagnostic on the device page: `_latest_thumbnail_url`,
+  `_latest_original_url`
 
 Every result sensor carries `query` and `mode` attributes, plus `full_value` when
-the text was too long to fit in the state.
+the text was too long to fit in the state. States are kept short (asset URLs are
+shown as `d716cc5f…/thumbnail`, longer text is cut at 100 characters) so they do
+not wrap and push the entity names around in the device page — read `full_value`
+in automations and templates when you need the complete text or URL.
 
 The latest result is persisted, so the sensors and the card still show the last answer
 after a Home Assistant restart rather than going blank.
