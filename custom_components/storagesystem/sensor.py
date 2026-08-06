@@ -14,7 +14,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt as dt_util
 
@@ -216,15 +216,42 @@ class StorageSystemResultSensor(StorageSystemEntity, SensorEntity):
 
 
 class StorageSystemApiTimestampSensor(StorageSystemEntity, SensorEntity):
-    """When the app last reported itself healthy."""
+    """Since when the app has been answering health polls.
+
+    This used to report the ``date`` field straight from every health payload,
+    which is the app's current clock and therefore changed on every poll — one
+    logbook entry and one recorder row per minute, saying nothing the
+    connectivity sensor does not already say. It now only moves when the
+    connection actually changes state.
+    """
 
     _attr_device_class = SensorDeviceClass.TIMESTAMP
-    _attr_entity_category = None
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_translation_key = "api_timestamp"
 
     def __init__(self, coordinator: StorageSystemCoordinator) -> None:
         """Set up the timestamp sensor."""
         super().__init__(coordinator, "api_timestamp")
+        self._connected_since: datetime | None = None
+
+    async def async_added_to_hass(self) -> None:
+        """Seed the timestamp from the refresh that ran before setup."""
+        await super().async_added_to_hass()
+        self._track_connection()
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Move the timestamp only across a connected/disconnected edge."""
+        self._track_connection()
+        super()._handle_coordinator_update()
+
+    def _track_connection(self) -> None:
+        if not self.coordinator.last_update_success:
+            self._connected_since = None
+        elif self._connected_since is None:
+            raw = (self.coordinator.data or {}).get("date")
+            parsed = dt_util.parse_datetime(raw) if isinstance(raw, str) else None
+            self._connected_since = parsed or dt_util.utcnow()
 
     @property
     def available(self) -> bool:
@@ -233,6 +260,5 @@ class StorageSystemApiTimestampSensor(StorageSystemEntity, SensorEntity):
 
     @property
     def native_value(self) -> datetime | None:
-        """Return the parsed date from the health payload."""
-        raw = (self.coordinator.data or {}).get("date")
-        return dt_util.parse_datetime(raw) if isinstance(raw, str) else None
+        """Return when the app was first seen healthy in the current stretch."""
+        return self._connected_since

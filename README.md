@@ -69,7 +69,11 @@ instead of silently going offline.
 One device per instance, with:
 
 - `binary_sensor.storage_system_api` — connectivity, attributes `base_url` and `service`
-- `sensor.storage_system_api_timestamp` — timestamp from the last health poll
+- `sensor.storage_system_api_timestamp` — when the API was first seen healthy in
+  the current connected stretch. It deliberately does *not* follow the clock in
+  every health payload: that changed on every poll and wrote a logbook entry and
+  a recorder row per minute. It now only moves when the connection drops and
+  comes back, so "unchanged for three days" means three days of uptime.
 - `sensor.storage_system_latest_answer`, `_latest_query`, `_latest_location`,
   `_latest_box_id`, `_latest_label`, `_latest_source`, `_latest_summary`,
   `_latest_keywords`, `_latest_match_count`, `_latest_photo_count`,

@@ -59,7 +59,7 @@
     },
     "sensor": {
       "api_timestamp": {
-        "name": "API-tidsstämpel"
+        "name": "API ansluten sedan"
       },
       "latest_query": {
         "name": "Senaste fråga"
